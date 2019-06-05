@@ -30,15 +30,22 @@ else{
         echo $_FILES['upfile']['error'];
         exit;
 }
+
+mysqli_query($conn, "set autocommit = 0");	// autocommit 해제
+mysqli_query($conn, "set transation isolation level serializable");	// isolation level 설정
+mysqli_query($conn, "begin");	// begins a transation
+
 $query = "INSERT INTO archive(uploader,name_og,time,related_course) VALUES('$uploader','$name', NOW(),'$course_name')";
         
 $res = mysqli_query($conn, $query);
 
 if(!$res){
+        mysqli_query($conn, "rollback"); // query 수행 실패. 수행 전으로 rollback
         echo "<script>alert(\"업로드 실패.\");</script>";
         echo "<meta http-equiv='refresh' content='0;url=archive.php'>";
 }
 else{
+        mysqli_query($conn, "commit"); // query 수행 성공. 수행 내역 commit
         echo "<script>alert(\"업로드 성공.\");</script>";
         echo "<meta http-equiv='refresh' content='0;url=archive.php'>";
 }
